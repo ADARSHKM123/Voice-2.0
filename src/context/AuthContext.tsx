@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { setTokens, clearTokens, getRefreshToken, setOnTokenRefreshFailed } from '../services/api';
+import { setTokens, clearTokens, getRefreshToken, setOnTokenRefreshFailed, toBase64 } from '../services/api';
 import { loginUser, registerUser, logoutUser } from '../services/auth';
 
 interface User {
@@ -27,8 +27,7 @@ function generatePlaceholderKeyParams() {
     for (let i = 0; i < 32; i++) {
       bytes.push(Math.floor(Math.random() * 256));
     }
-    // Simple base64-like encoding for placeholder
-    return btoa(String.fromCharCode(...bytes));
+    return toBase64(String.fromCharCode(...bytes));
   };
 
   return {

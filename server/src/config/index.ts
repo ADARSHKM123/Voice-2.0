@@ -1,6 +1,8 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
+// Try multiple locations: cwd (when running from server/) and relative to source
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 export const config = {

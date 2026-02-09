@@ -13,8 +13,8 @@ async function start(): Promise<void> {
     await runMigrations();
 
     // Start server
-    app.listen(config.port, () => {
-      logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`);
+    app.listen(config.port, '0.0.0.0', () => {
+      logger.info(`Server running on 0.0.0.0:${config.port} in ${config.nodeEnv} mode`);
     });
   } catch (err) {
     logger.error('Failed to start server', err);

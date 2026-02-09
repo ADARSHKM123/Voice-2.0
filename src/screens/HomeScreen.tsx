@@ -15,6 +15,7 @@ import VoiceSvg from '../../assets/icons/voice-recorder.svg';
 import { useAuth } from '../context/AuthContext';
 import { processTranscript } from '../services/voice';
 import { getEntries, createEntry } from '../services/vault';
+import { toBase64 } from '../services/api';
 
 async function requestMicrophonePermission(): Promise<boolean> {
   if (Platform.OS === 'android') {
@@ -104,7 +105,7 @@ export default function HomeScreen() {
         // In a real app, the client would encrypt before sending.
         // For now we store a placeholder encrypted blob.
         if (intent.action === 'save' && intent.service) {
-          const placeholder = btoa(
+          const placeholder = toBase64(
             JSON.stringify({
               service: intent.service,
               username: intent.username,
@@ -113,8 +114,8 @@ export default function HomeScreen() {
           );
           await createEntry({
             encryptedData: placeholder,
-            iv: btoa('placeholder-iv'),
-            tag: btoa('placeholder-tag'),
+            iv: toBase64('placeholder-iv'),
+            tag: toBase64('placeholder-tag'),
             category: intent.category || 'password',
           });
           await loadEntries();
