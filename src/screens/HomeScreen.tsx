@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,13 +9,16 @@ import {
   Alert,
   ActivityIndicator,
   FlatList,
+  Animated,
+  StatusBar,
 } from 'react-native';
 import Voice, { SpeechResultsEvent, SpeechErrorEvent } from '@react-native-voice/voice';
+import Tts from 'react-native-tts';
 import VoiceSvg from '../../assets/icons/voice-recorder.svg';
 import { useAuth } from '../context/AuthContext';
 import { processTranscript } from '../services/voice';
-import { getEntries, createEntry } from '../services/vault';
-import { toBase64 } from '../services/api';
+import { getEntries, createEntry, updateEntry, deleteEntry } from '../services/vault';
+import { toBase64, fromBase64 } from '../services/api';
 
 async function requestMicrophonePermission(): Promise<boolean> {
   if (Platform.OS === 'android') {
@@ -39,6 +42,15 @@ interface VaultItem {
   created_at: string;
 }
 
+// Initialize TTS
+Tts.setDefaultLanguage('en-US');
+Tts.setDefaultRate(0.45);
+
+function speak(text: string) {
+  Tts.stop();
+  Tts.speak(text);
+}
+
 export default function HomeScreen() {
   const { user, logout } = useAuth();
   const [isListening, setIsListening] = useState(false);
@@ -47,6 +59,60 @@ export default function HomeScreen() {
   const [intentResult, setIntentResult] = useState<string>('');
   const [entries, setEntries] = useState<VaultItem[]>([]);
   const [loadingEntries, setLoadingEntries] = useState(false);
+
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const ringAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
+
+  // Pulse animation when listening
+  useEffect(() => {
+    if (isListening) {
+      const pulse = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, {
+            toValue: 1.15,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseAnim, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+        ]),
+      );
+      const ring = Animated.loop(
+        Animated.sequence([
+          Animated.timing(ringAnim, {
+            toValue: 1,
+            duration: 1200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(ringAnim, {
+            toValue: 0,
+            duration: 1200,
+            useNativeDriver: true,
+          }),
+        ]),
+      );
+      pulse.start();
+      ring.start();
+      return () => {
+        pulse.stop();
+        ring.stop();
+        pulseAnim.setValue(1);
+        ringAnim.setValue(0);
+      };
+    }
+  }, [isListening, pulseAnim, ringAnim]);
 
   useEffect(() => {
     Voice.onSpeechStart = () => {};
@@ -101,28 +167,151 @@ export default function HomeScreen() {
             (intent.password ? `\nPassword: ${intent.password}` : ''),
         );
 
-        // If it's a save action, store the encrypted entry
-        // In a real app, the client would encrypt before sending.
-        // For now we store a placeholder encrypted blob.
+        // Save action
         if (intent.action === 'save' && intent.service) {
-          const placeholder = toBase64(
-            JSON.stringify({
+          if (!intent.password) {
+            const msg = `No password detected for ${intent.service}. Please say the password after the service name, for example: save my Amazon password hunter42`;
+            setIntentResult(msg);
+            speak(`No password detected for ${intent.service}. Please include the password in your command.`);
+          } else {
+            const payload = JSON.stringify({
               service: intent.service,
               username: intent.username,
               password: intent.password,
-            }),
-          );
-          await createEntry({
-            encryptedData: placeholder,
-            iv: toBase64('placeholder-iv'),
-            tag: toBase64('placeholder-tag'),
-            category: intent.category || 'password',
-          });
+            });
+            await createEntry({
+              encryptedData: toBase64(payload),
+              iv: toBase64('placeholder-iv'),
+              tag: toBase64('placeholder-tag'),
+              category: intent.category || 'password',
+            });
+            await loadEntries();
+            const msg = `Saved password for ${intent.service}`;
+            setIntentResult(msg);
+            speak(msg);
+          }
+        }
+
+        // Retrieve action
+        if (intent.action === 'retrieve' && intent.service) {
+          const entriesResult = await getEntries();
+          if (entriesResult.success && entriesResult.data) {
+            const serviceLower = intent.service.toLowerCase();
+            let found = false;
+            for (const entry of entriesResult.data) {
+              try {
+                const raw = fromBase64(entry.encrypted_data);
+                const decoded = JSON.parse(raw);
+                if (decoded.service && decoded.service.toLowerCase().includes(serviceLower)) {
+                  const lines = [`Found ${decoded.service}:`];
+                  let speechParts = `Your ${decoded.service} password is `;
+                  if (decoded.username) {
+                    lines.push(`Username: ${decoded.username}`);
+                  }
+                  if (decoded.password) {
+                    lines.push(`Password: ${decoded.password}`);
+                    speechParts += decoded.password.split('').join(' ');
+                  } else {
+                    speechParts += 'not set';
+                  }
+                  setIntentResult(lines.join('\n'));
+                  speak(speechParts);
+                  found = true;
+                  break;
+                }
+              } catch (decodeErr) {
+                console.log('[Retrieve] Could not decode entry:', entry.id, decodeErr);
+              }
+            }
+            if (!found) {
+              const msg = `No saved password found for ${intent.service}`;
+              setIntentResult(msg);
+              speak(msg);
+            }
+          }
+        }
+
+        // List action
+        if (intent.action === 'list') {
           await loadEntries();
         }
 
-        if (intent.action === 'list') {
-          await loadEntries();
+        // Update action
+        if (intent.action === 'update' && intent.service) {
+          if (!intent.password) {
+            const msg = `No new password detected for ${intent.service}. Say the new password in your command.`;
+            setIntentResult(msg);
+            speak(msg);
+          } else {
+            const entriesResult = await getEntries();
+            if (entriesResult.success && entriesResult.data) {
+              const serviceLower = intent.service.toLowerCase();
+              let updated = false;
+              for (const entry of entriesResult.data) {
+                try {
+                  const raw = fromBase64(entry.encrypted_data);
+                  const decoded = JSON.parse(raw);
+                  if (decoded.service && decoded.service.toLowerCase().includes(serviceLower)) {
+                    const newPayload = JSON.stringify({
+                      service: decoded.service,
+                      username: intent.username ?? decoded.username,
+                      password: intent.password,
+                    });
+                    await updateEntry(entry.id, {
+                      encryptedData: toBase64(newPayload),
+                      iv: toBase64('placeholder-iv'),
+                      tag: toBase64('placeholder-tag'),
+                      category: entry.category,
+                    });
+                    await loadEntries();
+                    const msg = `Updated password for ${decoded.service}`;
+                    setIntentResult(msg);
+                    speak(msg);
+                    updated = true;
+                    break;
+                  }
+                } catch {
+                  // skip unreadable entries
+                }
+              }
+              if (!updated) {
+                const msg = `No saved entry found for ${intent.service}`;
+                setIntentResult(msg);
+                speak(msg);
+              }
+            }
+          }
+        }
+
+        // Delete action
+        if (intent.action === 'delete' && intent.service) {
+          const entriesResult = await getEntries();
+          if (entriesResult.success && entriesResult.data) {
+            const serviceLower = intent.service.toLowerCase();
+            let deleted = false;
+            for (const entry of entriesResult.data) {
+              try {
+                const raw = fromBase64(entry.encrypted_data);
+                const decoded = JSON.parse(raw);
+                if (decoded.service && decoded.service.toLowerCase().includes(serviceLower)) {
+                  await deleteEntry(entry.id);
+                  await loadEntries();
+                  const msg = `Deleted password for ${decoded.service}`;
+                  setIntentResult(msg);
+                  speak(msg);
+                  deleted = true;
+                  break;
+                }
+              } catch {
+                // skip unreadable entries
+              }
+            }
+            if (!deleted) {
+              const msg = `No saved entry found for ${intent.service}`;
+              setIntentResult(msg);
+              speak(msg);
+            }
+          }
         }
       } else {
         setIntentResult(result.error || 'Failed to process voice command');
@@ -140,8 +329,8 @@ export default function HomeScreen() {
       setIntentResult('');
       await Voice.start('en-US');
       setIsListening(true);
-    } catch (error) {
-      console.error('Error starting voice:', error);
+    } catch (err) {
+      console.error('Error starting voice:', err);
     }
   };
 
@@ -149,8 +338,8 @@ export default function HomeScreen() {
     try {
       await Voice.stop();
       setIsListening(false);
-    } catch (error) {
-      console.error('Error stopping voice:', error);
+    } catch (err) {
+      console.error('Error stopping voice:', err);
     }
   };
 
@@ -178,92 +367,160 @@ export default function HomeScreen() {
     ]);
   };
 
+  const getCategoryColor = (category: string) => {
+    switch (category.toLowerCase()) {
+      case 'password': return '#3B82F6';
+      case 'note': return '#8B5CF6';
+      case 'card': return '#F59E0B';
+      default: return '#6B7280';
+    }
+  };
+
   const renderEntry = ({ item }: { item: VaultItem }) => (
     <View style={styles.entryCard}>
-      <View style={styles.entryBadge}>
-        <Text style={styles.entryBadgeText}>{item.category}</Text>
+      <View style={[styles.entryBadge, { backgroundColor: getCategoryColor(item.category) + '20' }]}>
+        <Text style={[styles.entryBadgeText, { color: getCategoryColor(item.category) }]}>
+          {item.category}
+        </Text>
       </View>
-      <Text style={styles.entryId} numberOfLines={1}>
-        {item.id.slice(0, 8)}...
-      </Text>
-      <Text style={styles.entryDate}>
-        {new Date(item.created_at).toLocaleDateString()}
-      </Text>
+      <View style={styles.entryInfo}>
+        <Text style={styles.entryId} numberOfLines={1}>
+          {item.id.slice(0, 8)}...
+        </Text>
+        <Text style={styles.entryDate}>
+          {new Date(item.created_at).toLocaleDateString()}
+        </Text>
+      </View>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>Voice</Text>
-          <Text style={styles.headerEmail}>{user?.email}</Text>
-        </View>
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
+      <StatusBar barStyle="light-content" backgroundColor="#08080D" />
+
+      {/* Ambient glow */}
+      <View style={styles.glowContainer}>
+        <View style={styles.glowOrb1} />
+        <View style={styles.glowOrb2} />
       </View>
 
-      {/* Voice Section */}
-      <View style={styles.voiceSection}>
-        <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
-          <VoiceSvg
-            width={100}
-            height={100}
-            fill={isListening ? '#FF4444' : undefined}
-          />
-        </TouchableOpacity>
+      <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
 
-        <Text style={styles.statusText}>
-          {isListening
-            ? 'Listening...'
-            : processing
-            ? 'Processing...'
-            : 'Tap to speak'}
-        </Text>
-
-        {processing && <ActivityIndicator color="#007AFF" style={styles.spinner} />}
-
-        {transcript ? (
-          <View style={styles.transcriptBox}>
-            <Text style={styles.transcriptLabel}>You said:</Text>
-            <Text style={styles.transcriptText}>{transcript}</Text>
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.headerTitle}>Voice Vault</Text>
+            <Text style={styles.headerEmail}>{user?.email}</Text>
           </View>
-        ) : null}
-
-        {intentResult ? (
-          <View style={styles.intentBox}>
-            <Text style={styles.intentLabel}>Parsed Intent:</Text>
-            <Text style={styles.intentText}>{intentResult}</Text>
-          </View>
-        ) : null}
-      </View>
-
-      {/* Vault Entries Section */}
-      <View style={styles.vaultSection}>
-        <View style={styles.vaultHeader}>
-          <Text style={styles.vaultTitle}>Vault ({entries.length})</Text>
-          <TouchableOpacity onPress={loadEntries}>
-            <Text style={styles.refreshText}>Refresh</Text>
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton} activeOpacity={0.7}>
+            <Text style={styles.logoutText}>Logout</Text>
           </TouchableOpacity>
         </View>
 
-        {loadingEntries ? (
-          <ActivityIndicator color="#fff" />
-        ) : entries.length === 0 ? (
-          <Text style={styles.emptyText}>
-            No entries yet. Use voice to save passwords.
+        {/* Voice Section */}
+        <View style={styles.voiceSection}>
+          <View style={styles.voiceButtonContainer}>
+            {/* Outer ring animation */}
+            {isListening && (
+              <Animated.View
+                style={[
+                  styles.voiceRing,
+                  {
+                    opacity: ringAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.5, 0],
+                    }),
+                    transform: [{
+                      scale: ringAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [1, 1.8],
+                      }),
+                    }],
+                  },
+                ]}
+              />
+            )}
+
+            <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+              <TouchableOpacity
+                onPress={handlePress}
+                activeOpacity={0.7}
+                style={[
+                  styles.voiceButton,
+                  isListening && styles.voiceButtonActive,
+                ]}>
+                <VoiceSvg
+                  width={40}
+                  height={40}
+                  fill={isListening ? '#FFFFFF' : '#8E95A2'}
+                />
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
+
+          <Text style={styles.statusText}>
+            {isListening
+              ? 'Listening...'
+              : processing
+              ? 'Processing...'
+              : 'Tap to speak'}
           </Text>
-        ) : (
-          <FlatList
-            data={entries}
-            keyExtractor={item => item.id}
-            renderItem={renderEntry}
-            style={styles.entryList}
-          />
-        )}
-      </View>
+
+          {processing && <ActivityIndicator color="#3B82F6" style={styles.spinner} />}
+
+          {transcript ? (
+            <View style={styles.transcriptBox}>
+              <Text style={styles.transcriptLabel}>You said</Text>
+              <Text style={styles.transcriptText}>{transcript}</Text>
+            </View>
+          ) : null}
+
+          {intentResult ? (
+            <View style={styles.intentBox}>
+              <Text style={styles.intentLabel}>Parsed Intent</Text>
+              <Text style={styles.intentText}>{intentResult}</Text>
+            </View>
+          ) : null}
+        </View>
+
+        {/* Vault Entries Section */}
+        <View style={styles.vaultSection}>
+          <View style={styles.vaultHeader}>
+            <View style={styles.vaultTitleRow}>
+              <Text style={styles.vaultTitle}>Vault</Text>
+              <View style={styles.countBadge}>
+                <Text style={styles.countText}>{entries.length}</Text>
+              </View>
+            </View>
+            <TouchableOpacity onPress={loadEntries} style={styles.refreshButton} activeOpacity={0.7}>
+              <Text style={styles.refreshText}>Refresh</Text>
+            </TouchableOpacity>
+          </View>
+
+          {loadingEntries ? (
+            <View style={styles.emptyContainer}>
+              <ActivityIndicator color="#3B82F6" />
+            </View>
+          ) : entries.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyIcon}>~</Text>
+              <Text style={styles.emptyText}>No entries yet</Text>
+              <Text style={styles.emptySubtext}>
+                Use voice commands to save passwords
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={entries}
+              keyExtractor={item => item.id}
+              renderItem={renderEntry}
+              style={styles.entryList}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
+        </View>
+
+      </Animated.View>
     </View>
   );
 }
@@ -271,112 +528,229 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0e1f6c',
+    backgroundColor: '#08080D',
   },
+  glowContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    overflow: 'hidden',
+  },
+  glowOrb1: {
+    position: 'absolute',
+    top: -80,
+    right: -40,
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    backgroundColor: 'rgba(59, 130, 246, 0.06)',
+  },
+  glowOrb2: {
+    position: 'absolute',
+    bottom: 100,
+    left: -80,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(99, 102, 241, 0.04)',
+  },
+  content: {
+    flex: 1,
+  },
+
+  // Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'ios' ? 56 : 20,
-    paddingBottom: 12,
+    paddingHorizontal: 24,
+    paddingTop: Platform.OS === 'ios' ? 56 : 24,
+    paddingBottom: 16,
   },
   headerTitle: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: '700',
+    color: '#F0F0F5',
+    letterSpacing: -0.3,
   },
   headerEmail: {
     fontSize: 13,
-    color: '#a0aee6',
+    color: '#5A5F6B',
     marginTop: 2,
   },
   logoutButton: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 8,
+    borderRadius: 10,
   },
   logoutText: {
-    color: '#fff',
-    fontSize: 14,
+    color: '#8E95A2',
+    fontSize: 13,
     fontWeight: '600',
   },
+
+  // Voice Section
   voiceSection: {
     alignItems: 'center',
-    paddingVertical: 24,
+    paddingVertical: 28,
+    paddingHorizontal: 24,
+  },
+  voiceButtonContainer: {
+    width: 100,
+    height: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  voiceRing: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: '#3B82F6',
+  },
+  voiceButton: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  voiceButtonActive: {
+    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+    borderColor: 'rgba(239, 68, 68, 0.4)',
   },
   statusText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#a0aee6',
+    marginTop: 14,
+    fontSize: 14,
+    color: '#5A5F6B',
+    letterSpacing: 0.3,
   },
   spinner: {
-    marginTop: 8,
+    marginTop: 10,
   },
   transcriptBox: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 10,
-    padding: 14,
-    marginTop: 16,
-    marginHorizontal: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: 14,
+    padding: 16,
+    marginTop: 18,
     alignSelf: 'stretch',
   },
   transcriptLabel: {
-    fontSize: 12,
-    color: '#a0aee6',
-    marginBottom: 4,
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#5A5F6B',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginBottom: 6,
   },
   transcriptText: {
-    fontSize: 16,
-    color: '#fff',
+    fontSize: 15,
+    color: '#E8E8ED',
+    lineHeight: 22,
   },
   intentBox: {
-    backgroundColor: 'rgba(0,122,255,0.2)',
-    borderRadius: 10,
-    padding: 14,
+    backgroundColor: 'rgba(59, 130, 246, 0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.12)',
+    borderRadius: 14,
+    padding: 16,
     marginTop: 10,
-    marginHorizontal: 20,
     alignSelf: 'stretch',
   },
   intentLabel: {
-    fontSize: 12,
-    color: '#7ab8ff',
-    marginBottom: 4,
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#3B82F6',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginBottom: 6,
   },
   intentText: {
     fontSize: 14,
-    color: '#fff',
+    color: '#E8E8ED',
+    lineHeight: 22,
   },
+
+  // Vault Section
   vaultSection: {
     flex: 1,
-    marginTop: 8,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingHorizontal: 20,
-    paddingTop: 16,
+    marginTop: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    borderWidth: 1,
+    borderBottomWidth: 0,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    paddingHorizontal: 24,
+    paddingTop: 20,
   },
   vaultHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
+  },
+  vaultTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   vaultTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#fff',
+    color: '#F0F0F5',
+    letterSpacing: -0.2,
+  },
+  countBadge: {
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    marginLeft: 10,
+  },
+  countText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#3B82F6',
+  },
+  refreshButton: {
+    paddingVertical: 4,
+    paddingHorizontal: 2,
   },
   refreshText: {
-    fontSize: 14,
-    color: '#007AFF',
+    fontSize: 13,
+    color: '#3B82F6',
+    fontWeight: '600',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  emptyIcon: {
+    fontSize: 32,
+    color: '#2A2E38',
+    marginBottom: 12,
   },
   emptyText: {
-    color: '#a0aee6',
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 24,
+    color: '#5A5F6B',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  emptySubtext: {
+    color: '#3A3F4B',
+    fontSize: 13,
+    marginTop: 4,
   },
   entryList: {
     flex: 1,
@@ -384,31 +758,40 @@ const styles = StyleSheet.create({
   entryCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 14,
     padding: 14,
     marginBottom: 8,
   },
   entryBadge: {
-    backgroundColor: '#007AFF',
-    borderRadius: 6,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    marginRight: 10,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginRight: 12,
   },
   entryBadgeText: {
-    color: '#fff',
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: '700',
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  entryInfo: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   entryId: {
     flex: 1,
-    color: '#fff',
+    color: '#E8E8ED',
     fontSize: 14,
+    fontWeight: '500',
   },
   entryDate: {
-    color: '#a0aee6',
+    color: '#5A5F6B',
     fontSize: 12,
+    marginLeft: 8,
   },
 });

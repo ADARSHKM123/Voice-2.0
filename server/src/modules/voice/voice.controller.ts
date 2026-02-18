@@ -6,6 +6,7 @@ import { success } from '../../shared/utils/response';
 export async function processVoice(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
   try {
     const { transcript } = req.body;
+    console.log(transcript)
     const intent = await voiceService.processTranscript(transcript);
     success(res, { intent, transcript });
   } catch (err) {

@@ -26,6 +26,13 @@ export const config = {
     apiKey: process.env.ANTHROPIC_API_KEY || '',
   },
 
+  groq: {
+    apiKey: process.env.GROQ_API_KEY || '',
+  },
+
+  // 'groq' or 'anthropic'
+  aiProvider: (process.env.AI_PROVIDER || 'groq') as 'groq' | 'anthropic',
+
   cors: {
     origin: process.env.CORS_ORIGIN || '*',
   },

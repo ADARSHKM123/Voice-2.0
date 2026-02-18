@@ -1,0 +1,136 @@
+2026-02-09 22:27:01 [info]: Database connected successfully
+2026-02-09 22:27:01 [info]: Migration applied: 001_initial.sql
+2026-02-09 22:35:20 [info]: Database connected successfully
+2026-02-09 22:35:20 [info]: Migration applied: 001_initial.sql
+2026-02-09 22:35:20 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-09 22:43:12 [info]: Database connected successfully
+2026-02-09 22:43:12 [info]: Migration applied: 001_initial.sql
+2026-02-09 22:43:12 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-09 22:52:27 [info]: Database connected successfully
+2026-02-09 22:52:27 [info]: Migration applied: 001_initial.sql
+2026-02-09 22:52:27 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-12 15:09:10 [info]: Database connected successfully
+2026-02-12 15:09:11 [info]: Migration applied: 001_initial.sql
+2026-02-12 15:35:28 [info]: Database connected successfully
+2026-02-12 15:35:29 [info]: Migration applied: 001_initial.sql
+2026-02-12 15:54:44 [error]: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CY41fo8Yphu5nYpeM9RyP"}
+    at Function.generate (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\error.ts:67:14)
+    at Anthropic.makeStatusError (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:454:21)
+    at Anthropic.makeRequest (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:518:24)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:22:19)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:9:20)
+2026-02-12 16:23:06 [info]: Database connected successfully
+2026-02-12 16:23:06 [info]: Migration applied: 001_initial.sql
+2026-02-12 16:25:27 [info]: Database connected successfully
+2026-02-12 16:25:27 [info]: Migration applied: 001_initial.sql
+2026-02-12 16:25:28 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-12 16:26:23 [error]: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CY445nUm2ZeWfWxyUvSSr"}
+    at Function.generate (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\error.ts:67:14)
+    at Anthropic.makeStatusError (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:454:21)
+    at Anthropic.makeRequest (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:518:24)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:22:19)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:9:20)
+2026-02-12 16:26:48 [error]: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CY447cDRvTg3k5oSfs2qK"}
+    at Function.generate (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\error.ts:67:14)
+    at Anthropic.makeStatusError (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:454:21)
+    at Anthropic.makeRequest (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:518:24)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:22:19)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:9:20)
+2026-02-12 17:09:16 [error]: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CY47MUekawamsS64eyFLe"}
+    at Function.generate (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\error.ts:67:14)
+    at Anthropic.makeStatusError (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:454:21)
+    at Anthropic.makeRequest (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:518:24)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:22:19)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:9:20)
+2026-02-12 17:10:36 [info]: Database connected successfully
+2026-02-12 17:10:36 [info]: Migration applied: 001_initial.sql
+2026-02-12 17:10:36 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-12 17:10:44 [error]: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CY47Ty5D13ChQxvp1Nn3T"}
+    at Function.generate (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\error.ts:67:14)
+    at Anthropic.makeStatusError (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:454:21)
+    at Anthropic.makeRequest (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:518:24)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:22:19)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:10:20)
+2026-02-12 17:21:40 [info]: Database connected successfully
+2026-02-12 17:21:40 [info]: Migration applied: 001_initial.sql
+2026-02-12 17:21:41 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-12 17:23:53 [info]: Database connected successfully
+2026-02-12 17:23:53 [info]: Migration applied: 001_initial.sql
+2026-02-12 17:23:53 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-12 17:25:36 [info]: Database connected successfully
+2026-02-12 17:25:36 [info]: Migration applied: 001_initial.sql
+2026-02-12 17:25:36 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-12 17:25:59 [info]: Processing transcript with provider: groq
+2026-02-12 17:26:00 [error]: Error: Groq API error 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+
+    at processWithGroq (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:58:11)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:76:20)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:10:20)
+2026-02-12 17:26:13 [info]: Processing transcript with provider: groq
+2026-02-12 17:26:13 [error]: Error: Groq API error 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+
+    at processWithGroq (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:58:11)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:76:20)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:10:20)
+2026-02-12 17:29:13 [info]: Database connected successfully
+2026-02-12 17:29:13 [info]: Migration applied: 001_initial.sql
+2026-02-12 17:29:13 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-12 17:29:18 [info]: Processing transcript with provider: groq
+2026-02-12 17:29:32 [info]: Processing transcript with provider: groq
+2026-02-12 17:31:03 [info]: Processing transcript with provider: groq
+2026-02-12 17:31:25 [info]: Processing transcript with provider: groq
+2026-02-12 17:32:04 [info]: Processing transcript with provider: groq
+2026-02-12 17:35:48 [info]: Processing transcript with provider: groq
+2026-02-12 17:36:13 [info]: Database connected successfully
+2026-02-12 17:36:13 [info]: Migration applied: 001_initial.sql
+2026-02-12 17:36:13 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-12 17:36:25 [info]: Processing transcript with provider: groq
+2026-02-12 17:42:36 [info]: Processing transcript with provider: groq
+2026-02-12 17:42:46 [info]: Processing transcript with provider: groq
+2026-02-12 17:43:22 [info]: Database connected successfully
+2026-02-12 17:43:22 [info]: Migration applied: 001_initial.sql
+2026-02-12 17:43:22 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-18 15:12:18 [info]: Database connected successfully
+2026-02-18 15:12:18 [info]: Migration applied: 001_initial.sql
+2026-02-18 15:12:18 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-18 16:24:15 [info]: Database connected successfully
+2026-02-18 16:24:15 [info]: Migration applied: 001_initial.sql
+2026-02-18 16:24:15 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-18 16:24:53 [info]: Processing transcript with provider: groq
+2026-02-18 16:25:48 [info]: Processing transcript with provider: groq
+2026-02-18 16:26:08 [info]: Processing transcript with provider: groq
+2026-02-18 16:26:24 [info]: Processing transcript with provider: groq
+2026-02-18 16:26:44 [info]: Processing transcript with provider: groq
+2026-02-18 16:26:59 [info]: Processing transcript with provider: groq
+2026-02-18 16:27:10 [info]: Processing transcript with provider: groq
+2026-02-18 16:27:19 [info]: Processing transcript with provider: groq
+2026-02-18 16:27:30 [info]: Processing transcript with provider: groq
+2026-02-18 16:27:43 [info]: Processing transcript with provider: groq
+2026-02-18 16:28:23 [info]: Processing transcript with provider: groq
+2026-02-18 16:28:55 [info]: Processing transcript with provider: groq
+2026-02-18 16:43:33 [info]: Processing transcript with provider: groq
+2026-02-18 16:59:16 [info]: Processing transcript with provider: groq
+2026-02-18 16:59:31 [info]: Processing transcript with provider: groq
+2026-02-18 16:59:46 [info]: Processing transcript with provider: groq
+2026-02-18 17:00:01 [info]: Processing transcript with provider: groq
+2026-02-18 17:00:18 [info]: Processing transcript with provider: groq
+2026-02-18 17:00:27 [info]: Processing transcript with provider: groq
+2026-02-18 17:00:42 [info]: Processing transcript with provider: groq
+2026-02-18 17:01:13 [info]: Processing transcript with provider: groq
+2026-02-18 17:15:35 [info]: Processing transcript with provider: groq
+2026-02-18 17:15:55 [info]: Processing transcript with provider: groq
+2026-02-18 17:16:13 [info]: Processing transcript with provider: groq
+2026-02-18 17:16:31 [info]: Processing transcript with provider: groq
+2026-02-18 17:16:52 [info]: Processing transcript with provider: groq
+2026-02-18 17:21:46 [info]: Processing transcript with provider: groq
+2026-02-18 17:21:56 [info]: Processing transcript with provider: groq
+2026-02-18 17:22:22 [info]: Processing transcript with provider: groq
+2026-02-18 17:22:37 [info]: Processing transcript with provider: groq
+2026-02-18 17:22:46 [info]: Processing transcript with provider: groq

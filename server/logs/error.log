@@ -1,0 +1,47 @@
+2026-02-12 15:54:44 [error]: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CY41fo8Yphu5nYpeM9RyP"}
+    at Function.generate (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\error.ts:67:14)
+    at Anthropic.makeStatusError (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:454:21)
+    at Anthropic.makeRequest (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:518:24)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:22:19)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:9:20)
+2026-02-12 16:26:23 [error]: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CY445nUm2ZeWfWxyUvSSr"}
+    at Function.generate (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\error.ts:67:14)
+    at Anthropic.makeStatusError (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:454:21)
+    at Anthropic.makeRequest (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:518:24)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:22:19)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:9:20)
+2026-02-12 16:26:48 [error]: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CY447cDRvTg3k5oSfs2qK"}
+    at Function.generate (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\error.ts:67:14)
+    at Anthropic.makeStatusError (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:454:21)
+    at Anthropic.makeRequest (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:518:24)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:22:19)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:9:20)
+2026-02-12 17:09:16 [error]: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CY47MUekawamsS64eyFLe"}
+    at Function.generate (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\error.ts:67:14)
+    at Anthropic.makeStatusError (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:454:21)
+    at Anthropic.makeRequest (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:518:24)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:22:19)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:9:20)
+2026-02-12 17:10:44 [error]: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CY47Ty5D13ChQxvp1Nn3T"}
+    at Function.generate (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\error.ts:67:14)
+    at Anthropic.makeStatusError (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:454:21)
+    at Anthropic.makeRequest (C:\Desktop\personal\Voice\server\node_modules\@anthropic-ai\sdk\src\core.ts:518:24)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:22:19)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:10:20)
+2026-02-12 17:26:00 [error]: Error: Groq API error 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+
+    at processWithGroq (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:58:11)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:76:20)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:10:20)
+2026-02-12 17:26:13 [error]: Error: Groq API error 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
+
+    at processWithGroq (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:58:11)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:76:20)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:10:20)

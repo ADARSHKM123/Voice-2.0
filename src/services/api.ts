@@ -21,6 +21,29 @@ export function toBase64(input: string): string {
   return result;
 }
 
+export function fromBase64(input: string): string {
+  const lookup: Record<string, number> = {};
+  for (let i = 0; i < BASE64_CHARS.length; i++) {
+    lookup[BASE64_CHARS[i]] = i;
+  }
+  const clean = input.replace(/=+$/, '');
+  let result = '';
+  for (let i = 0; i < clean.length; i += 4) {
+    const a = lookup[clean[i]] || 0;
+    const b = lookup[clean[i + 1]] || 0;
+    const c = lookup[clean[i + 2]] || 0;
+    const d = lookup[clean[i + 3]] || 0;
+    result += String.fromCharCode((a << 2) | (b >> 4));
+    if (clean[i + 2] !== undefined) {
+      result += String.fromCharCode(((b & 15) << 4) | (c >> 2));
+    }
+    if (clean[i + 3] !== undefined) {
+      result += String.fromCharCode(((c & 3) << 6) | d);
+    }
+  }
+  return result;
+}
+
 let accessToken: string | null = null;
 let refreshToken: string | null = null;
 let onTokenRefreshFailed: (() => void) | null = null;
