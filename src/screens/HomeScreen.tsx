@@ -19,6 +19,8 @@ import { useAuth } from '../context/AuthContext';
 import { processTranscript } from '../services/voice';
 import { getEntries, createEntry, updateEntry, deleteEntry } from '../services/vault';
 import { toBase64, fromBase64 } from '../services/api';
+import * as ElevenLabs from '../services/elevenlabs';
+import type { ConversationState } from '../services/elevenlabs';
 
 async function requestMicrophonePermission(): Promise<boolean> {
   if (Platform.OS === 'android') {
@@ -53,10 +55,21 @@ function speak(text: string) {
 
 export default function HomeScreen() {
   const { user, logout } = useAuth();
+
+  // ── Mode toggle ────────────────────────────────────────────────────────────
+  const [mode, setMode] = useState<'groq' | 'elevenlabs'>('groq');
+
+  // ── Groq mode state ────────────────────────────────────────────────────────
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [processing, setProcessing] = useState(false);
   const [intentResult, setIntentResult] = useState<string>('');
+
+  // ── ElevenLabs mode state ──────────────────────────────────────────────────
+  const [convState, setConvState] = useState<ConversationState>('idle');
+  const [convMessages, setConvMessages] = useState<{ role: 'user' | 'agent'; text: string }[]>([]);
+
+  // ── Shared state ───────────────────────────────────────────────────────────
   const [entries, setEntries] = useState<VaultItem[]>([]);
   const [loadingEntries, setLoadingEntries] = useState(false);
 
@@ -127,6 +140,21 @@ export default function HomeScreen() {
 
     return () => {
       Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
+
+  // ElevenLabs handlers — set once, stable references via closures
+  useEffect(() => {
+    ElevenLabs.setHandlers({
+      onStateChange: (state: ConversationState) => setConvState(state),
+      onUserTranscript: (text: string) =>
+        setConvMessages(prev => [...prev, { role: 'user', text }]),
+      onAgentTranscript: (text: string) =>
+        setConvMessages(prev => [...prev, { role: 'agent', text }]),
+      onError: (message: string) => Alert.alert('Connection Error', message),
+    });
+    return () => {
+      ElevenLabs.stopConversation();
     };
   }, []);
 
@@ -346,17 +374,23 @@ export default function HomeScreen() {
   const handlePress = async () => {
     const hasPermission = await requestMicrophonePermission();
     if (!hasPermission) {
-      Alert.alert(
-        'Permission Denied',
-        'Microphone permission is required for voice recording.',
-      );
+      Alert.alert('Permission Denied', 'Microphone permission is required for voice recording.');
       return;
     }
 
-    if (isListening) {
-      await stopListening();
+    if (mode === 'elevenlabs') {
+      if (ElevenLabs.isActive()) {
+        ElevenLabs.stopConversation();
+      } else {
+        setConvMessages([]);
+        await ElevenLabs.startConversation();
+      }
     } else {
-      await startListening();
+      if (isListening) {
+        await stopListening();
+      } else {
+        await startListening();
+      }
     }
   };
 
@@ -417,25 +451,36 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Mode toggle */}
+        <View style={styles.modeToggle}>
+          <TouchableOpacity
+            style={[styles.modeBtn, mode === 'groq' && styles.modeBtnActive]}
+            onPress={() => { setMode('groq'); ElevenLabs.stopConversation(); }}
+            activeOpacity={0.7}>
+            <Text style={[styles.modeBtnText, mode === 'groq' && styles.modeBtnTextActive]}>
+              Commands
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.modeBtn, mode === 'elevenlabs' && styles.modeBtnActive]}
+            onPress={() => setMode('elevenlabs')}
+            activeOpacity={0.7}>
+            <Text style={[styles.modeBtnText, mode === 'elevenlabs' && styles.modeBtnTextActive]}>
+              Conversation
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Voice Section */}
         <View style={styles.voiceSection}>
           <View style={styles.voiceButtonContainer}>
-            {/* Outer ring animation */}
-            {isListening && (
+            {(mode === 'groq' ? isListening : convState !== 'idle' && convState !== 'disconnected') && (
               <Animated.View
                 style={[
                   styles.voiceRing,
                   {
-                    opacity: ringAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0.5, 0],
-                    }),
-                    transform: [{
-                      scale: ringAnim.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [1, 1.8],
-                      }),
-                    }],
+                    opacity: ringAnim.interpolate({ inputRange: [0, 1], outputRange: [0.5, 0] }),
+                    transform: [{ scale: ringAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.8] }) }],
                   },
                 ]}
               />
@@ -447,40 +492,58 @@ export default function HomeScreen() {
                 activeOpacity={0.7}
                 style={[
                   styles.voiceButton,
-                  isListening && styles.voiceButtonActive,
+                  (mode === 'groq' ? isListening : ElevenLabs.isActive()) && styles.voiceButtonActive,
                 ]}>
                 <VoiceSvg
                   width={40}
                   height={40}
-                  fill={isListening ? '#FFFFFF' : '#8E95A2'}
+                  fill={(mode === 'groq' ? isListening : ElevenLabs.isActive()) ? '#FFFFFF' : '#8E95A2'}
                 />
               </TouchableOpacity>
             </Animated.View>
           </View>
 
           <Text style={styles.statusText}>
-            {isListening
-              ? 'Listening...'
-              : processing
-              ? 'Processing...'
-              : 'Tap to speak'}
+            {mode === 'elevenlabs'
+              ? convState === 'connecting'    ? 'Connecting...'
+              : convState === 'listening'     ? 'Listening...'
+              : convState === 'user_speaking' ? 'You are speaking...'
+              : convState === 'agent_speaking'? 'Agent speaking...'
+              : convState === 'disconnected'  ? 'Tap to reconnect'
+              :                                 'Tap to start conversation'
+            : isListening ? 'Listening...'
+            : processing  ? 'Processing...'
+            :               'Tap to speak'}
           </Text>
 
-          {processing && <ActivityIndicator color="#3B82F6" style={styles.spinner} />}
+          {mode === 'groq' && processing && <ActivityIndicator color="#3B82F6" style={styles.spinner} />}
 
-          {transcript ? (
+          {mode === 'groq' && transcript ? (
             <View style={styles.transcriptBox}>
               <Text style={styles.transcriptLabel}>You said</Text>
               <Text style={styles.transcriptText}>{transcript}</Text>
             </View>
           ) : null}
 
-          {intentResult ? (
+          {mode === 'groq' && intentResult ? (
             <View style={styles.intentBox}>
               <Text style={styles.intentLabel}>Parsed Intent</Text>
               <Text style={styles.intentText}>{intentResult}</Text>
             </View>
           ) : null}
+
+          {mode === 'elevenlabs' && convMessages.length > 0 && (
+            <View style={styles.convContainer}>
+              {convMessages.slice(-4).map((msg, i) => (
+                <View key={i} style={[styles.convBubble, msg.role === 'user' ? styles.convUserBubble : styles.convAgentBubble]}>
+                  <Text style={[styles.convBubbleRole, msg.role === 'user' ? styles.convUserRole : styles.convAgentRole]}>
+                    {msg.role === 'user' ? 'You' : 'Agent'}
+                  </Text>
+                  <Text style={styles.convBubbleText}>{msg.text}</Text>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* Vault Entries Section */}
@@ -793,5 +856,78 @@ const styles = StyleSheet.create({
     color: '#5A5F6B',
     fontSize: 12,
     marginLeft: 8,
+  },
+
+  // Mode toggle
+  modeToggle: {
+    flexDirection: 'row',
+    marginHorizontal: 24,
+    marginBottom: 4,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
+    padding: 3,
+  },
+  modeBtn: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  modeBtnActive: {
+    backgroundColor: 'rgba(59,130,246,0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(59,130,246,0.3)',
+  },
+  modeBtnText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#5A5F6B',
+  },
+  modeBtnTextActive: {
+    color: '#3B82F6',
+  },
+
+  // Conversation bubbles (ElevenLabs mode)
+  convContainer: {
+    alignSelf: 'stretch',
+    marginTop: 14,
+    gap: 8,
+  },
+  convBubble: {
+    borderRadius: 14,
+    padding: 12,
+    borderWidth: 1,
+  },
+  convUserBubble: {
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderColor: 'rgba(255,255,255,0.07)',
+    alignSelf: 'flex-end',
+    maxWidth: '85%',
+  },
+  convAgentBubble: {
+    backgroundColor: 'rgba(59,130,246,0.07)',
+    borderColor: 'rgba(59,130,246,0.15)',
+    alignSelf: 'flex-start',
+    maxWidth: '85%',
+  },
+  convBubbleRole: {
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginBottom: 4,
+  },
+  convUserRole: {
+    color: '#5A5F6B',
+  },
+  convAgentRole: {
+    color: '#3B82F6',
+  },
+  convBubbleText: {
+    fontSize: 14,
+    color: '#E8E8ED',
+    lineHeight: 20,
   },
 });

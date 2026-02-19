@@ -11,5 +11,6 @@ const transcriptSchema = z.object({
 const router = Router();
 
 router.post('/process', authenticate, validate(transcriptSchema), voiceController.processVoice);
+router.get('/elevenlabs-session', authenticate, voiceController.getElevenLabsSession);
 
 export default router;

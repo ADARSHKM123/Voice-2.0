@@ -45,3 +45,50 @@
     at processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:76:20)
     at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:10:20)
+2026-02-19 15:49:39 [error]: Error: Invalid email or password
+    at Object.login (C:\Desktop\personal\Voice\server\src\modules\auth\auth.service.ts:65:17)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async login (C:\Desktop\personal\Voice\server\src\modules\auth\auth.controller.ts:17:20)
+2026-02-19 15:49:40 [error]: Error: Invalid email or password
+    at Object.login (C:\Desktop\personal\Voice\server\src\modules\auth\auth.service.ts:65:17)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async login (C:\Desktop\personal\Voice\server\src\modules\auth\auth.controller.ts:17:20)
+2026-02-19 15:50:05 [error]: Error: Invalid email or password
+    at Object.login (C:\Desktop\personal\Voice\server\src\modules\auth\auth.service.ts:73:17)
+    at async login (C:\Desktop\personal\Voice\server\src\modules\auth\auth.controller.ts:17:20)
+2026-02-19 15:50:33 [error]: Error: ElevenLabs token error 405: {"detail":"Method Not Allowed"}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:36:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 15:50:44 [error]: Error: ElevenLabs token error 405: {"detail":"Method Not Allowed"}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:36:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 15:50:47 [error]: Error: ElevenLabs token error 405: {"detail":"Method Not Allowed"}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:36:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 15:50:54 [error]: Error: ElevenLabs token error 405: {"detail":"Method Not Allowed"}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:36:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 15:51:13 [error]: Error: ElevenLabs token error 405: {"detail":"Method Not Allowed"}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:36:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 16:07:16 [error]: Error: ElevenLabs token error 429: {"detail":{"status":"workspace_concurrency_limit_exceeded","message":"Workspace has reached its maximum concurrent capacity. Please try again later."}}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:38:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 16:17:24 [error]: Error: ElevenLabs token error 429: {"detail":{"status":"workspace_concurrency_limit_exceeded","message":"Workspace has reached its maximum concurrent capacity. Please try again later."}}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:38:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 16:19:58 [error]: Error: ElevenLabs token error 429: {"detail":{"status":"workspace_concurrency_limit_exceeded","message":"Workspace has reached its maximum concurrent capacity. Please try again later."}}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:38:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 16:20:02 [error]: Error: ElevenLabs token error 429: {"detail":{"status":"workspace_concurrency_limit_exceeded","message":"Workspace has reached its maximum concurrent capacity. Please try again later."}}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:38:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 16:20:05 [error]: Error: ElevenLabs token error 429: {"detail":{"status":"workspace_concurrency_limit_exceeded","message":"Workspace has reached its maximum concurrent capacity. Please try again later."}}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:38:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 16:20:06 [error]: Error: ElevenLabs token error 429: {"detail":{"status":"workspace_concurrency_limit_exceeded","message":"Workspace has reached its maximum concurrent capacity. Please try again later."}}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:38:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 16:20:08 [error]: Error: ElevenLabs token error 429: {"detail":{"status":"workspace_concurrency_limit_exceeded","message":"Workspace has reached its maximum concurrent capacity. Please try again later."}}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:38:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)

@@ -14,6 +14,9 @@
     "@react-native-voice/voice": "^3.2.4",
     "react": "18.3.1",
     "react-native": "0.76.6",
+    "react-native-audio-record": "^0.2.2",
+    "react-native-fs": "^2.20.0",
+    "react-native-sound": "^0.13.0",
     "react-native-svg": "^15.12.1",
     "react-native-tts": "^4.1.1"
   },

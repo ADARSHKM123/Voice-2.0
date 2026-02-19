@@ -30,6 +30,11 @@ export const config = {
     apiKey: process.env.GROQ_API_KEY || '',
   },
 
+  elevenlabs: {
+    apiKey: process.env.ELEVENLABS_API_KEY || '',
+    agentId: process.env.ELEVENLABS_AGENT_ID || '',
+  },
+
   // 'groq' or 'anthropic'
   aiProvider: (process.env.AI_PROVIDER || 'groq') as 'groq' | 'anthropic',
 

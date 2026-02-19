@@ -134,3 +134,109 @@
 2026-02-18 17:22:22 [info]: Processing transcript with provider: groq
 2026-02-18 17:22:37 [info]: Processing transcript with provider: groq
 2026-02-18 17:22:46 [info]: Processing transcript with provider: groq
+2026-02-19 13:21:44 [info]: Database connected successfully
+2026-02-19 13:21:44 [info]: Migration applied: 001_initial.sql
+2026-02-19 13:21:44 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-19 13:22:03 [info]: Database connected successfully
+2026-02-19 13:22:03 [info]: Migration applied: 001_initial.sql
+2026-02-19 13:22:03 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-19 13:22:19 [info]: Database connected successfully
+2026-02-19 13:22:19 [info]: Migration applied: 001_initial.sql
+2026-02-19 13:22:19 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-19 13:22:29 [info]: Database connected successfully
+2026-02-19 13:22:29 [info]: Migration applied: 001_initial.sql
+2026-02-19 13:22:29 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-19 13:22:50 [info]: Database connected successfully
+2026-02-19 13:22:50 [info]: Migration applied: 001_initial.sql
+2026-02-19 13:22:50 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-19 15:14:12 [info]: Database connected successfully
+2026-02-19 15:14:12 [info]: Migration applied: 001_initial.sql
+2026-02-19 15:14:12 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-19 15:27:21 [info]: Database connected successfully
+2026-02-19 15:27:21 [info]: Migration applied: 001_initial.sql
+2026-02-19 15:30:29 [info]: Database connected successfully
+2026-02-19 15:30:29 [info]: Migration applied: 001_initial.sql
+2026-02-19 15:30:29 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-19 15:49:39 [error]: Error: Invalid email or password
+    at Object.login (C:\Desktop\personal\Voice\server\src\modules\auth\auth.service.ts:65:17)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async login (C:\Desktop\personal\Voice\server\src\modules\auth\auth.controller.ts:17:20)
+2026-02-19 15:49:40 [error]: Error: Invalid email or password
+    at Object.login (C:\Desktop\personal\Voice\server\src\modules\auth\auth.service.ts:65:17)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async login (C:\Desktop\personal\Voice\server\src\modules\auth\auth.controller.ts:17:20)
+2026-02-19 15:50:05 [error]: Error: Invalid email or password
+    at Object.login (C:\Desktop\personal\Voice\server\src\modules\auth\auth.service.ts:73:17)
+    at async login (C:\Desktop\personal\Voice\server\src\modules\auth\auth.controller.ts:17:20)
+2026-02-19 15:50:33 [error]: Error: ElevenLabs token error 405: {"detail":"Method Not Allowed"}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:36:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 15:50:39 [info]: Processing transcript with provider: groq
+2026-02-19 15:50:44 [error]: Error: ElevenLabs token error 405: {"detail":"Method Not Allowed"}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:36:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 15:50:47 [error]: Error: ElevenLabs token error 405: {"detail":"Method Not Allowed"}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:36:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 15:50:54 [error]: Error: ElevenLabs token error 405: {"detail":"Method Not Allowed"}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:36:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 15:51:04 [info]: Processing transcript with provider: groq
+2026-02-19 15:51:13 [error]: Error: ElevenLabs token error 405: {"detail":"Method Not Allowed"}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:36:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 15:52:12 [info]: Database connected successfully
+2026-02-19 15:52:12 [info]: Migration applied: 001_initial.sql
+2026-02-19 15:52:12 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-19 15:53:39 [info]: Database connected successfully
+2026-02-19 15:53:39 [info]: Migration applied: 001_initial.sql
+2026-02-19 15:53:39 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-19 15:53:53 [info]: ElevenLabs token response
+2026-02-19 15:54:13 [info]: ElevenLabs token response
+2026-02-19 15:54:27 [info]: ElevenLabs token response
+2026-02-19 15:54:31 [info]: ElevenLabs token response
+2026-02-19 15:55:30 [info]: Database connected successfully
+2026-02-19 15:55:30 [info]: Migration applied: 001_initial.sql
+2026-02-19 15:55:30 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-19 16:07:16 [error]: Error: ElevenLabs token error 429: {"detail":{"status":"workspace_concurrency_limit_exceeded","message":"Workspace has reached its maximum concurrent capacity. Please try again later."}}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:38:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 16:07:23 [info]: ElevenLabs token response
+2026-02-19 16:07:43 [info]: ElevenLabs token response
+2026-02-19 16:07:55 [info]: ElevenLabs token response
+2026-02-19 16:08:28 [info]: ElevenLabs token response
+2026-02-19 16:12:07 [info]: ElevenLabs token response
+2026-02-19 16:12:27 [info]: ElevenLabs token response
+2026-02-19 16:12:36 [info]: ElevenLabs token response
+2026-02-19 16:15:01 [info]: Database connected successfully
+2026-02-19 16:15:01 [info]: Migration applied: 001_initial.sql
+2026-02-19 16:15:01 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-19 16:15:58 [info]: Database connected successfully
+2026-02-19 16:15:58 [info]: Migration applied: 001_initial.sql
+2026-02-19 16:15:58 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-19 16:16:33 [info]: ElevenLabs token response
+2026-02-19 16:17:24 [error]: Error: ElevenLabs token error 429: {"detail":{"status":"workspace_concurrency_limit_exceeded","message":"Workspace has reached its maximum concurrent capacity. Please try again later."}}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:38:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 16:19:58 [error]: Error: ElevenLabs token error 429: {"detail":{"status":"workspace_concurrency_limit_exceeded","message":"Workspace has reached its maximum concurrent capacity. Please try again later."}}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:38:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 16:20:02 [error]: Error: ElevenLabs token error 429: {"detail":{"status":"workspace_concurrency_limit_exceeded","message":"Workspace has reached its maximum concurrent capacity. Please try again later."}}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:38:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 16:20:05 [error]: Error: ElevenLabs token error 429: {"detail":{"status":"workspace_concurrency_limit_exceeded","message":"Workspace has reached its maximum concurrent capacity. Please try again later."}}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:38:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 16:20:06 [error]: Error: ElevenLabs token error 429: {"detail":{"status":"workspace_concurrency_limit_exceeded","message":"Workspace has reached its maximum concurrent capacity. Please try again later."}}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:38:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 16:20:08 [error]: Error: ElevenLabs token error 429: {"detail":{"status":"workspace_concurrency_limit_exceeded","message":"Workspace has reached its maximum concurrent capacity. Please try again later."}}
+    at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:38:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-19 16:21:11 [info]: Database connected successfully
+2026-02-19 16:21:11 [info]: Migration applied: 001_initial.sql
+2026-02-19 16:21:11 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-19 16:25:26 [info]: ElevenLabs token response
+2026-02-19 16:40:35 [info]: ElevenLabs token response
+2026-02-19 16:41:57 [info]: Processing transcript with provider: groq
+2026-02-19 16:42:01 [info]: ElevenLabs token response
