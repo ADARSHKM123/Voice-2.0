@@ -152,6 +152,7 @@ export default function HomeScreen() {
       onAgentTranscript: (text: string) =>
         setConvMessages(prev => [...prev, { role: 'agent', text }]),
       onError: (message: string) => Alert.alert('Connection Error', message),
+      onVaultChanged: loadEntries,
     });
     return () => {
       ElevenLabs.stopConversation();

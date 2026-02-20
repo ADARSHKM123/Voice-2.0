@@ -240,3 +240,63 @@
 2026-02-19 16:40:35 [info]: ElevenLabs token response
 2026-02-19 16:41:57 [info]: Processing transcript with provider: groq
 2026-02-19 16:42:01 [info]: ElevenLabs token response
+2026-02-20 15:04:30 [info]: Database connected successfully
+2026-02-20 15:04:30 [info]: Migration applied: 001_initial.sql
+2026-02-20 15:04:30 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-20 15:06:49 [info]: ElevenLabs token response
+2026-02-20 15:09:03 [info]: ElevenLabs token response
+2026-02-20 15:11:10 [info]: ElevenLabs token response
+2026-02-20 15:11:14 [info]: ElevenLabs token response
+2026-02-20 15:13:43 [info]: Processing transcript with provider: groq
+2026-02-20 15:13:43 [error]: Error: Groq API error 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"expired_api_key"}}
+
+    at processWithGroq (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:58:11)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:76:20)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:12:20)
+2026-02-20 15:13:53 [info]: Processing transcript with provider: groq
+2026-02-20 15:13:53 [error]: Error: Groq API error 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"expired_api_key"}}
+
+    at processWithGroq (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:58:11)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:76:20)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:12:20)
+2026-02-20 15:17:55 [info]: Database connected successfully
+2026-02-20 15:17:55 [info]: Migration applied: 001_initial.sql
+2026-02-20 15:17:55 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-20 15:18:35 [info]: Processing transcript with provider: groq
+2026-02-20 15:18:44 [info]: Processing transcript with provider: groq
+2026-02-20 15:38:25 [info]: ElevenLabs token response
+2026-02-20 15:39:29 [info]: Processing transcript with provider: groq
+2026-02-20 15:44:34 [info]: ElevenLabs token response
+2026-02-20 15:49:57 [info]: Database connected successfully
+2026-02-20 15:49:57 [info]: Migration applied: 001_initial.sql
+2026-02-20 15:49:57 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-20 15:50:08 [info]: Database connected successfully
+2026-02-20 15:50:08 [info]: Migration applied: 001_initial.sql
+2026-02-20 15:50:08 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-20 15:50:19 [info]: Database connected successfully
+2026-02-20 15:50:19 [info]: Migration applied: 001_initial.sql
+2026-02-20 15:50:19 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-20 15:50:28 [info]: Database connected successfully
+2026-02-20 15:50:28 [info]: Migration applied: 001_initial.sql
+2026-02-20 15:50:28 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-20 15:50:36 [info]: Database connected successfully
+2026-02-20 15:50:36 [info]: Migration applied: 001_initial.sql
+2026-02-20 15:50:36 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-20 15:50:45 [info]: Database connected successfully
+2026-02-20 15:50:45 [info]: Migration applied: 001_initial.sql
+2026-02-20 15:50:45 [info]: Server running on 0.0.0.0:3000 in development mode
+2026-02-20 15:50:59 [info]: ElevenLabs token response
+2026-02-20 15:51:05 [info]: [VaultCtrl] getEntries request
+2026-02-20 15:51:05 [info]: [VaultSvc] getEntries: querying DB
+2026-02-20 15:51:05 [info]: [VaultSvc] getEntries: DB returned
+2026-02-20 15:51:05 [info]: [VaultCtrl] getEntries response
+2026-02-20 15:51:23 [info]: [VaultCtrl] getEntries request
+2026-02-20 15:51:23 [info]: [VaultSvc] getEntries: querying DB
+2026-02-20 15:51:23 [info]: [VaultSvc] getEntries: DB returned
+2026-02-20 15:51:23 [info]: [VaultCtrl] getEntries response
+2026-02-20 15:51:32 [info]: [VaultCtrl] getEntries request
+2026-02-20 15:51:32 [info]: [VaultSvc] getEntries: querying DB
+2026-02-20 15:51:32 [info]: [VaultSvc] getEntries: DB returned
+2026-02-20 15:51:32 [info]: [VaultCtrl] getEntries response

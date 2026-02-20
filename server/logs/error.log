@@ -92,3 +92,15 @@
 2026-02-19 16:20:08 [error]: Error: ElevenLabs token error 429: {"detail":{"status":"workspace_concurrency_limit_exceeded","message":"Workspace has reached its maximum concurrent capacity. Please try again later."}}
     at getElevenLabsSession (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:38:13)
     at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-20 15:13:43 [error]: Error: Groq API error 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"expired_api_key"}}
+
+    at processWithGroq (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:58:11)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:76:20)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:12:20)
+2026-02-20 15:13:53 [error]: Error: Groq API error 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"expired_api_key"}}
+
+    at processWithGroq (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:58:11)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.processTranscript (C:\Desktop\personal\Voice\server\src\modules\voice\voice.service.ts:76:20)
+    at async processVoice (C:\Desktop\personal\Voice\server\src\modules\voice\voice.controller.ts:12:20)

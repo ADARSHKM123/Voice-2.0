@@ -12,7 +12,7 @@ export async function processVoice(req: AuthenticatedRequest, res: Response, nex
     const intent = await voiceService.processTranscript(transcript);
     success(res, { intent, transcript });
   } catch (err) {
-    next(err);
+    next(err); 
   }
 }
 

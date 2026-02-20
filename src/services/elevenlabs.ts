@@ -22,6 +22,7 @@ export type ElevenLabsHandlers = {
   onUserTranscript: (text: string) => void;
   onAgentTranscript: (text: string) => void;
   onError: (message: string) => void;
+  onVaultChanged?: () => void;
 };
 
 // ─── Module state ─────────────────────────────────────────────────────────────
@@ -31,6 +32,8 @@ let isConnecting = false;
 let handlers: ElevenLabsHandlers | null = null;
 let audioChunks: Uint8Array[] = [];
 let currentSound: Sound | null = null;
+// Format announced by the agent in conversation_initiation_metadata (e.g. "pcm_16000", "mp3_44100_128")
+let agentOutputFormat = 'pcm_16000';
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
@@ -97,6 +100,7 @@ export async function startConversation(): Promise<void> {
 
 export function stopConversation() {
   isConnecting = false;
+  agentOutputFormat = 'pcm_16000';
   stopMicStream();
   currentSound?.stop();
   currentSound?.release();
@@ -114,9 +118,13 @@ export function isActive(): boolean {
 
 async function handleMessage(msg: any) {
   switch (msg.type) {
-    case 'conversation_initiation_metadata':
+    case 'conversation_initiation_metadata': {
+      const fmt = msg.conversation_initiation_metadata_event?.agent_output_audio_format;
+      if (fmt) { agentOutputFormat = fmt; }
+      console.log('[ElevenLabs] Agent output format:', agentOutputFormat);
       handlers?.onStateChange('listening');
       break;
+    }
 
     case 'user_transcript':
       handlers?.onUserTranscript(msg.user_transcription_event.user_transcript);
@@ -208,15 +216,15 @@ async function playCollectedAudio() {
     }
     audioChunks = [];
 
-    // ElevenLabs ConvAI sends raw PCM (16kHz, 16-bit, mono) by default, not MP3.
-    // Detect by checking for MP3 sync/ID3 bytes; otherwise wrap in a WAV header.
-    const looksLikeMP3 =
-      combined.length >= 3 &&
-      ((combined[0] === 0xFF && (combined[1] & 0xE0) === 0xE0) || // MPEG sync
-       (combined[0] === 0x49 && combined[1] === 0x44 && combined[2] === 0x33)); // ID3
-    const ext = looksLikeMP3 ? 'mp3' : 'wav';
-    const fileData = looksLikeMP3 ? combined : buildWavBuffer(combined);
-    console.log(`[ElevenLabs] Audio: ${combined.length} bytes, format=${ext}`);
+    // Use the format the agent declared at conversation start — far more reliable
+    // than magic-byte sniffing.  agentOutputFormat is e.g. "pcm_16000" or "mp3_44100_128".
+    const isPCM = agentOutputFormat.startsWith('pcm');
+    const sampleRate = isPCM
+      ? (parseInt(agentOutputFormat.split('_')[1] ?? '16000', 10) || 16000)
+      : 44100;
+    const ext = isPCM ? 'wav' : 'mp3';
+    const fileData = isPCM ? buildWavBuffer(combined, sampleRate) : combined;
+    console.log(`[ElevenLabs] Audio: ${combined.length} bytes, agentFormat=${agentOutputFormat} → writing .${ext}`);
 
     const path = `${RNFS.TemporaryDirectoryPath}/el_agent_${Date.now()}.${ext}`;
     await RNFS.writeFile(path, encodeBase64(fileData), 'base64');
@@ -251,7 +259,16 @@ async function playCollectedAudio() {
 
 // ─── Vault tool execution (called by ElevenLabs agent) ───────────────────────
 
+/** Match helper — true if either string contains the other (case-insensitive, trimmed). */
+function serviceMatches(stored: string | undefined | null, search: string): boolean {
+  if (!stored) { return false; }
+  const a = stored.toLowerCase().trim();
+  const b = search.toLowerCase().trim();
+  return a.includes(b) || b.includes(a);
+}
+
 async function executeVaultTool(toolName: string, params: any): Promise<string> {
+  console.log(`[VaultTool] ${toolName} called, params:`, JSON.stringify(params));
   try {
     switch (toolName) {
       case 'save_password': {
@@ -269,26 +286,32 @@ async function executeVaultTool(toolName: string, params: any): Promise<string> 
           tag: toBase64('placeholder-tag'),
           category: 'password',
         });
-        return `Password saved for ${params.service}`;
+        handlers?.onVaultChanged?.();
+        return `Saved. Service: ${params.service}, password: ${params.password}${params.username ? `, username: ${params.username}` : ''}.`;
       }
 
       case 'get_password': {
         if (!params.service) { return 'Missing service parameter'; }
         const result = await getEntries();
-        if (!result.success || !result.data) { return 'Failed to fetch vault'; }
-        const serviceLower = params.service.toLowerCase();
+        if (!result.success || !result.data) { return 'Failed to fetch vault entries'; }
+        console.log(`[VaultTool] get_password: searching for "${params.service}", total entries: ${result.data.length}`);
         for (const entry of result.data) {
           try {
             const decoded = JSON.parse(fromBase64(entry.encrypted_data));
-            if (decoded.service?.toLowerCase().includes(serviceLower)) {
-              const parts = [`Service: ${decoded.service}`];
-              if (decoded.username) { parts.push(`Username: ${decoded.username}`); }
-              parts.push(decoded.password ? `Password: ${decoded.password}` : 'Password: not set');
-              return parts.join(', ');
+            console.log(`[VaultTool]   entry service: "${decoded.service}"`);
+            if (serviceMatches(decoded.service, params.service)) {
+              const pw = decoded.password ?? null;
+              const un = decoded.username ?? null;
+              if (!pw) {
+                return `Found ${decoded.service} but no password is stored for it.`;
+              }
+              return `The password for ${decoded.service} is ${pw}${un ? `. The username is ${un}` : ''}.`;
             }
-          } catch { /* skip */ }
+          } catch (e) {
+            console.log(`[VaultTool]   could not decode entry ${entry.id}:`, e);
+          }
         }
-        return `No saved entry found for ${params.service}`;
+        return `No saved password found for ${params.service}.`;
       }
 
       case 'update_password': {
@@ -296,12 +319,11 @@ async function executeVaultTool(toolName: string, params: any): Promise<string> 
           return 'Missing service or password parameter';
         }
         const result = await getEntries();
-        if (!result.success || !result.data) { return 'Failed to fetch vault'; }
-        const serviceLower = params.service.toLowerCase();
+        if (!result.success || !result.data) { return 'Failed to fetch vault entries'; }
         for (const entry of result.data) {
           try {
             const decoded = JSON.parse(fromBase64(entry.encrypted_data));
-            if (decoded.service?.toLowerCase().includes(serviceLower)) {
+            if (serviceMatches(decoded.service, params.service)) {
               const newPayload = JSON.stringify({
                 service: decoded.service,
                 username: decoded.username,
@@ -313,51 +335,59 @@ async function executeVaultTool(toolName: string, params: any): Promise<string> 
                 tag: toBase64('placeholder-tag'),
                 category: entry.category,
               });
-              return `Password updated for ${decoded.service}`;
+              handlers?.onVaultChanged?.();
+              return `Updated. The new password for ${decoded.service} is ${params.password}.`;
             }
-          } catch { /* skip */ }
+          } catch (e) {
+            console.log(`[VaultTool]   could not decode entry ${entry.id}:`, e);
+          }
         }
-        return `No saved entry found for ${params.service}`;
+        return `No saved entry found for ${params.service}.`;
       }
 
       case 'delete_password': {
         if (!params.service) { return 'Missing service parameter'; }
         const result = await getEntries();
-        if (!result.success || !result.data) { return 'Failed to fetch vault'; }
-        const serviceLower = params.service.toLowerCase();
+        if (!result.success || !result.data) { return 'Failed to fetch vault entries'; }
         for (const entry of result.data) {
           try {
             const decoded = JSON.parse(fromBase64(entry.encrypted_data));
-            if (decoded.service?.toLowerCase().includes(serviceLower)) {
+            if (serviceMatches(decoded.service, params.service)) {
               await deleteEntry(entry.id);
-              return `Deleted password for ${decoded.service}`;
+              handlers?.onVaultChanged?.();
+              return `Deleted the password for ${decoded.service}.`;
             }
-          } catch { /* skip */ }
+          } catch (e) {
+            console.log(`[VaultTool]   could not decode entry ${entry.id}:`, e);
+          }
         }
-        return `No saved entry found for ${params.service}`;
+        return `No saved entry found for ${params.service}.`;
       }
 
       case 'list_passwords': {
         const result = await getEntries();
         if (!result.success || !result.data || result.data.length === 0) {
-          return 'No passwords saved yet';
+          return 'No passwords saved yet.';
         }
         const services: string[] = [];
         for (const entry of result.data) {
           try {
             const decoded = JSON.parse(fromBase64(entry.encrypted_data));
             if (decoded.service) { services.push(decoded.service); }
-          } catch { /* skip */ }
+          } catch (e) {
+            console.log(`[VaultTool]   could not decode entry ${entry.id}:`, e);
+          }
         }
         return services.length > 0
-          ? `Saved services: ${services.join(', ')}`
-          : 'No readable entries found';
+          ? `You have passwords saved for: ${services.join(', ')}.`
+          : 'No readable entries found.';
       }
 
       default:
         return `Unknown tool: ${toolName}`;
     }
   } catch (e: any) {
+    console.error('[VaultTool] Unexpected error:', e);
     return `Error: ${e.message}`;
   }
 }
